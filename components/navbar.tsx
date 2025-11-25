@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Navbar as HeroUINavbar,
   NavbarContent,
@@ -14,6 +16,8 @@ import { Input } from "@heroui/input";
 import { link as linkStyles } from "@heroui/theme";
 import NextLink from "next/link";
 import clsx from "clsx";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 import { siteConfig } from "@/config/site";
 import { ThemeSwitch } from "@/components/theme-switch";
@@ -24,9 +28,31 @@ import {
   HeartFilledIcon,
   SearchIcon,
   Logo,
+  LogoutIcon,
 } from "@/components/icons";
 
 export const Navbar = () => {
+  const router = useRouter();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      const response = await fetch("/api/auth/logout", {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        router.push("/login");
+        router.refresh();
+      }
+    } catch (error) {
+      console.error("Erro ao fazer logout:", error);
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
+
   const searchInput = (
     <Input
       aria-label="Search"
@@ -54,7 +80,7 @@ export const Navbar = () => {
         <NavbarBrand as="li" className="gap-3 max-w-fit">
           <NextLink className="flex justify-start items-center gap-1" href="/">
             <Logo />
-            <p className="font-bold text-inherit">ACME</p>
+            <p className="font-bold text-inherit">AQUELE FILME</p>
           </NextLink>
         </NavbarBrand>
         <ul className="hidden lg:flex gap-4 justify-start ml-2">
@@ -92,18 +118,17 @@ export const Navbar = () => {
           <ThemeSwitch />
         </NavbarItem>
         <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
-        {/* <NavbarItem className="hidden md:flex">
+        <NavbarItem className="hidden sm:flex">
           <Button
-            isExternal
-            as={Link}
-            className="text-sm font-normal text-default-600 bg-default-100"
-            href={siteConfig.links.sponsor}
-            startContent={<HeartFilledIcon className="text-danger" />}
-            variant="flat"
+            isIconOnly
+            variant="light"
+            onPress={handleLogout}
+            isLoading={isLoggingOut}
+            aria-label="Logout"
           >
-            Sponsor
+            <LogoutIcon className="text-default-500" />
           </Button>
-        </NavbarItem> */}
+        </NavbarItem>
       </NavbarContent>
 
       <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">
@@ -136,6 +161,7 @@ export const Navbar = () => {
           ))}
         </div>
       </NavbarMenu>
+      
     </HeroUINavbar>
   );
 };

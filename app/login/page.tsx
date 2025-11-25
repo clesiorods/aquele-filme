@@ -54,7 +54,10 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
+    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] gap-8">
+      
+      <h1 className="text-2xl font-bold">AQUELE FILME</h1>
+
       <Card className="w-full max-w-md">
         <CardHeader className="flex flex-col gap-1 items-center pt-6">
           <h1 className={title({ size: "md" })}>
