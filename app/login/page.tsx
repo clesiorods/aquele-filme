@@ -44,8 +44,8 @@ export default function LoginPage() {
         return;
       }
 
-      // Redirecionar para dashboard após login/registro bem-sucedido
-      router.push("/dashboard");
+      // Redirecionar para página de filmes após login/registro bem-sucedido
+      router.push("/filmes");
       router.refresh();
     } catch (err) {
       setError("Erro ao conectar com o servidor");
@@ -54,18 +54,27 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] gap-8">
-      
-      <h1 className="text-2xl font-bold">AQUELE FILME</h1>
+    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] gap-10 px-4 py-8">
+      <div className="text-center space-y-4">
+        <h1 className="text-6xl md:text-8xl font-display font-black bg-gradient-to-r from-slate-400 via-slate-200 to-slate-400 bg-clip-text text-transparent tracking-widest uppercase drop-shadow-2xl" style={{ letterSpacing: '0.15em' }}>
+          AQUELE FILME
+        </h1>
+        <p className="text-default-500 text-sm md:text-base font-display font-light tracking-wide">
+          Gerencie seus filmes favoritos
+        </p>
+      </div>
 
-      <Card className="w-full max-w-md">
-        <CardHeader className="flex flex-col gap-1 items-center pt-6">
-          <h1 className={title({ size: "md" })}>
+      <Card className="w-full max-w-md shadow-2xl border border-default-200/50 backdrop-blur-sm bg-background/80">
+        <CardHeader className="flex flex-col gap-2 items-center pt-8 pb-4">
+          <h2 className={`text-2xl font-display font-bold ${isLogin ? 'text-primary' : 'text-secondary'}`}>
             {isLogin ? "Entrar" : "Criar Conta"}
-          </h1>
+          </h2>
+          <p className="text-default-500 text-sm font-display">
+            {isLogin ? "Acesse sua conta" : "Comece sua jornada cinematográfica"}
+          </p>
         </CardHeader>
-        <CardBody className="gap-4 pb-6">
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <CardBody className="gap-5 pb-8 px-6">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             {!isLogin && (
               <Input
                 label="Nome"
@@ -76,6 +85,10 @@ export default function LoginPage() {
                 }
                 required
                 isDisabled={loading}
+                classNames={{
+                  input: "font-display",
+                  label: "font-display font-medium",
+                }}
               />
             )}
             <Input
@@ -88,6 +101,10 @@ export default function LoginPage() {
               }
               required
               isDisabled={loading}
+              classNames={{
+                input: "font-display",
+                label: "font-display font-medium",
+              }}
             />
             <Input
               type={isPasswordVisible ? "text" : "password"}
@@ -100,6 +117,10 @@ export default function LoginPage() {
               required
               isDisabled={loading}
               minLength={4}
+              classNames={{
+                input: "font-display",
+                label: "font-display font-medium",
+              }}
               endContent={
                 <button
                   className="focus:outline-none"
@@ -115,18 +136,21 @@ export default function LoginPage() {
               }
             />
             {error && (
-              <div className="text-danger text-sm text-center">{error}</div>
+              <div className="text-danger text-sm text-center font-display p-3 rounded-lg bg-danger/10 border border-danger/20">
+                {error}
+              </div>
             )}
             <Button
               type="submit"
               color="primary"
-              className="w-full"
+              className="w-full font-display font-semibold text-base h-12"
               isLoading={loading}
+              size="lg"
             >
               {isLogin ? "Entrar" : "Criar Conta"}
             </Button>
           </form>
-          <div className="text-center text-sm">
+          <div className="text-center text-sm font-display pt-2">
             {isLogin ? (
               <>
                 Não tem uma conta?{" "}
