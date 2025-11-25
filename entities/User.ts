@@ -21,6 +21,9 @@ export class User {
   @Column({ type: "varchar" })
   name!: string;
 
+  @Column({ type: "boolean", default: false })
+  isAdmin!: boolean;
+
   @CreateDateColumn()
   createdAt!: Date;
 

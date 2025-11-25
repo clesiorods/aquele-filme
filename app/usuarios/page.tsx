@@ -8,6 +8,8 @@ import { Button } from "@heroui/button";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@heroui/table";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@heroui/modal";
 import { Spinner } from "@heroui/spinner";
+import { Chip } from "@heroui/chip";
+import { Switch } from "@heroui/switch";
 import { title, subtitle } from "@/components/primitives";
 import { EyeIcon, EyeSlashIcon } from "@/components/icons";
 
@@ -15,6 +17,7 @@ interface User {
   id: number;
   email: string;
   name: string;
+  isAdmin: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -31,6 +34,7 @@ export default function UsuariosPage() {
     email: "",
     name: "",
     password: "",
+    isAdmin: false,
   });
   const [formLoading, setFormLoading] = useState(false);
   const [isDeleting, setIsDeleting] = useState<number | null>(null);
@@ -52,13 +56,22 @@ export default function UsuariosPage() {
         router.push("/login");
         return;
       }
+      if (response.status === 403) {
+        alert("Acesso negado. Apenas administradores podem acessar esta página.");
+        router.push("/filmes");
+        return;
+      }
       if (!response.ok) {
-        throw new Error("Erro ao carregar usuários");
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Erro ao carregar usuários");
       }
       const data = await response.json();
       setUsers(data.users || []);
     } catch (error) {
       console.error("Erro ao carregar usuários:", error);
+      if (error instanceof Error) {
+        alert(error.message);
+      }
     } finally {
       setLoading(false);
     }
@@ -79,21 +92,21 @@ export default function UsuariosPage() {
 
   const handleCreate = () => {
     setEditingUser(null);
-    setFormData({ email: "", name: "", password: "" });
+    setFormData({ email: "", name: "", password: "", isAdmin: false });
     setIsPasswordVisible(false);
     onOpen();
   };
 
   const handleEdit = (user: User) => {
     setEditingUser(user);
-    setFormData({ email: user.email, name: user.name, password: "" });
+    setFormData({ email: user.email, name: user.name, password: "", isAdmin: user.isAdmin });
     setIsPasswordVisible(false);
     onOpen();
   };
 
   const handleModalClose = () => {
     setEditingUser(null);
-    setFormData({ email: "", name: "", password: "" });
+    setFormData({ email: "", name: "", password: "", isAdmin: false });
     setIsPasswordVisible(false);
     onClose();
   };
@@ -114,8 +127,8 @@ export default function UsuariosPage() {
       const url = editingUser ? `/api/users/${editingUser.id}` : "/api/users";
       const method = editingUser ? "PUT" : "POST";
       const body = editingUser
-        ? { email: formData.email, name: formData.name, ...(formData.password && { password: formData.password }) }
-        : { email: formData.email, name: formData.name, password: formData.password };
+        ? { email: formData.email, name: formData.name, isAdmin: formData.isAdmin, ...(formData.password && { password: formData.password }) }
+        : { email: formData.email, name: formData.name, password: formData.password, isAdmin: formData.isAdmin };
 
       const response = await fetch(url, {
         method,
@@ -202,6 +215,7 @@ export default function UsuariosPage() {
                 <TableColumn>ID</TableColumn>
                 <TableColumn>Nome</TableColumn>
                 <TableColumn>Email</TableColumn>
+                <TableColumn>Admin</TableColumn>
                 <TableColumn>Data de Criação</TableColumn>
                 <TableColumn>Ações</TableColumn>
               </TableHeader>
@@ -211,6 +225,13 @@ export default function UsuariosPage() {
                     <TableCell>{user.id}</TableCell>
                     <TableCell>{user.name}</TableCell>
                     <TableCell>{user.email}</TableCell>
+                    <TableCell>
+                      {user.isAdmin ? (
+                        <Chip color="primary" size="sm" variant="flat">Admin</Chip>
+                      ) : (
+                        <Chip color="default" size="sm" variant="flat">Usuário</Chip>
+                      )}
+                    </TableCell>
                     <TableCell>
                       {new Date(user.createdAt).toLocaleDateString("pt-BR")}
                     </TableCell>
@@ -272,6 +293,15 @@ export default function UsuariosPage() {
                 isDisabled={formLoading}
                 autoComplete="off"
               />
+              <Switch
+                isSelected={formData.isAdmin}
+                onValueChange={(isAdmin) =>
+                  setFormData({ ...formData, isAdmin })
+                }
+                isDisabled={formLoading}
+              >
+                Administrador
+              </Switch>
               <Input
                 label={editingUser ? "Nova Senha (deixe em branco para manter)" : "Senha"}
                 type={isPasswordVisible ? "text" : "password"}

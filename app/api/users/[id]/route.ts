@@ -4,7 +4,7 @@ import { User } from "@/entities/User";
 import { getCurrentUser } from "@/lib/auth";
 import { hashPassword } from "@/lib/auth";
 
-// GET - Obter um usuário específico
+// GET - Obter um usuário específico (apenas para admin)
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -15,6 +15,13 @@ export async function GET(
       return NextResponse.json(
         { error: "Não autenticado" },
         { status: 401 },
+      );
+    }
+
+    if (!user.isAdmin) {
+      return NextResponse.json(
+        { error: "Acesso negado. Apenas administradores podem acessar esta funcionalidade." },
+        { status: 403 },
       );
     }
 
@@ -31,7 +38,7 @@ export async function GET(
 
     const foundUser = await userRepository.findOne({
       where: { id: userId },
-      select: ["id", "email", "name", "createdAt", "updatedAt"],
+      select: ["id", "email", "name", "isAdmin", "createdAt", "updatedAt"],
     });
 
     if (!foundUser) {
@@ -51,7 +58,7 @@ export async function GET(
   }
 }
 
-// PUT - Atualizar um usuário
+// PUT - Atualizar um usuário (apenas para admin)
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -65,6 +72,13 @@ export async function PUT(
       );
     }
 
+    if (!user.isAdmin) {
+      return NextResponse.json(
+        { error: "Acesso negado. Apenas administradores podem atualizar usuários." },
+        { status: 403 },
+      );
+    }
+
     const userId = parseInt(params.id);
     if (isNaN(userId)) {
       return NextResponse.json(
@@ -73,7 +87,7 @@ export async function PUT(
       );
     }
 
-    const { email, password, name } = await request.json();
+    const { email, password, name, isAdmin } = await request.json();
 
     const dataSource = await getDataSource();
     const userRepository = dataSource.getRepository(User);
@@ -108,6 +122,17 @@ export async function PUT(
       foundUser.name = name;
     }
 
+    if (isAdmin !== undefined) {
+      // Não permitir que um admin remova seu próprio status de admin
+      if (userId === user.id && !isAdmin) {
+        return NextResponse.json(
+          { error: "Você não pode remover seu próprio status de administrador" },
+          { status: 400 },
+        );
+      }
+      foundUser.isAdmin = isAdmin;
+    }
+
     if (password !== undefined) {
       if (password.length < 4) {
         return NextResponse.json(
@@ -126,6 +151,7 @@ export async function PUT(
         id: foundUser.id,
         email: foundUser.email,
         name: foundUser.name,
+        isAdmin: foundUser.isAdmin,
         createdAt: foundUser.createdAt,
         updatedAt: foundUser.updatedAt,
       },
@@ -139,7 +165,7 @@ export async function PUT(
   }
 }
 
-// DELETE - Deletar um usuário
+// DELETE - Deletar um usuário (apenas para admin)
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -150,6 +176,13 @@ export async function DELETE(
       return NextResponse.json(
         { error: "Não autenticado" },
         { status: 401 },
+      );
+    }
+
+    if (!user.isAdmin) {
+      return NextResponse.json(
+        { error: "Acesso negado. Apenas administradores podem deletar usuários." },
+        { status: 403 },
       );
     }
 

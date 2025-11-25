@@ -4,7 +4,7 @@ import { User } from "@/entities/User";
 import { getCurrentUser } from "@/lib/auth";
 import { hashPassword } from "@/lib/auth";
 
-// GET - Listar todos os usuários (apenas para admin/autenticado)
+// GET - Listar todos os usuários (apenas para admin)
 export async function GET(request: NextRequest) {
   try {
     const user = await getCurrentUser();
@@ -15,11 +15,18 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    if (!user.isAdmin) {
+      return NextResponse.json(
+        { error: "Acesso negado. Apenas administradores podem acessar esta funcionalidade." },
+        { status: 403 },
+      );
+    }
+
     const dataSource = await getDataSource();
     const userRepository = dataSource.getRepository(User);
 
     const users = await userRepository.find({
-      select: ["id", "email", "name", "createdAt", "updatedAt"],
+      select: ["id", "email", "name", "isAdmin", "createdAt", "updatedAt"],
       order: { createdAt: "DESC" },
     });
 
@@ -33,7 +40,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST - Criar novo usuário
+// POST - Criar novo usuário (apenas para admin)
 export async function POST(request: NextRequest) {
   try {
     const user = await getCurrentUser();
@@ -44,7 +51,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { email, password, name } = await request.json();
+    if (!user.isAdmin) {
+      return NextResponse.json(
+        { error: "Acesso negado. Apenas administradores podem criar usuários." },
+        { status: 403 },
+      );
+    }
+
+    const { email, password, name, isAdmin } = await request.json();
 
     if (!email || !password || !name) {
       return NextResponse.json(
@@ -81,6 +95,7 @@ export async function POST(request: NextRequest) {
       email,
       password: hashedPassword,
       name,
+      isAdmin: isAdmin || false,
     });
 
     await userRepository.save(newUser);
@@ -92,6 +107,7 @@ export async function POST(request: NextRequest) {
           id: newUser.id, 
           email: newUser.email, 
           name: newUser.name,
+          isAdmin: newUser.isAdmin,
           createdAt: newUser.createdAt,
           updatedAt: newUser.updatedAt
         } 

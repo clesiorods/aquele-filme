@@ -32,6 +32,7 @@ async function seed() {
       email: "admin@admin.com",
       password: hashedPassword,
       name: "Administrador",
+      isAdmin: true,
     });
 
     await userRepository.save(adminUser);
