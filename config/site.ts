@@ -6,20 +6,24 @@ export const siteConfig = {
   navItems: [
     {
       label: "Home",
-      href: "/",
+      href: "/dashboard",
     },
     {
       label: "Filmes",
       href: "/filmes",
     },
+    {
+      label: "Usuários",
+      href: "/usuarios",
+    },
     // {
     //   label: "Docs",
     //   href: "/docs",
     // },
-    {
-      label: "Pricing",
-      href: "/pricing",
-    },
+    // {
+    //   label: "Pricing",
+    //   href: "/pricing",
+    // },
     // {
     //   label: "Blog",
     //   href: "/blog",
@@ -33,6 +37,10 @@ export const siteConfig = {
     {
       label: "Filmes",
       href: "/filmes",
+    },
+    {
+      label: "Usuários",
+      href: "/usuarios",
     },
     {
       label: "Dashboard",

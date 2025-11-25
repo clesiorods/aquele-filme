@@ -7,6 +7,7 @@ import { Input } from "@heroui/input";
 import { Button } from "@heroui/button";
 import { Link } from "@heroui/link";
 import { title } from "@/components/primitives";
+import { EyeIcon, EyeSlashIcon } from "@/components/icons";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -18,6 +19,7 @@ export default function LoginPage() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,7 +87,7 @@ export default function LoginPage() {
               isDisabled={loading}
             />
             <Input
-              type="password"
+              type={isPasswordVisible ? "text" : "password"}
               label="Senha"
               placeholder="••••••••"
               value={formData.password}
@@ -95,6 +97,19 @@ export default function LoginPage() {
               required
               isDisabled={loading}
               minLength={4}
+              endContent={
+                <button
+                  className="focus:outline-none"
+                  type="button"
+                  onClick={() => setIsPasswordVisible(!isPasswordVisible)}
+                >
+                  {isPasswordVisible ? (
+                    <EyeSlashIcon className="text-2xl text-default-400 pointer-events-none" />
+                  ) : (
+                    <EyeIcon className="text-2xl text-default-400 pointer-events-none" />
+                  )}
+                </button>
+              }
             />
             {error && (
               <div className="text-danger text-sm text-center">{error}</div>
