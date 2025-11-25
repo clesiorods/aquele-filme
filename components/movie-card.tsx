@@ -122,6 +122,22 @@ export default function MovieCard({ movie, onUpdate, onDelete }: MovieCardProps)
   const defaultImage = "https://via.placeholder.com/300x450/1a1a1a/ffffff?text=Sem+Capa";
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Não aplicar efeito 3D se o mouse estiver sobre elementos interativos
+    const target = e.target as HTMLElement;
+    const isInteractive = 
+      target.closest('button') || 
+      target.closest('[role="button"]') || 
+      target.closest('a') ||
+      target.closest('footer') ||
+      target.closest('[data-slot="footer"]') ||
+      target.tagName === 'BUTTON' ||
+      target.tagName === 'A';
+    
+    if (isInteractive) {
+      setTiltStyle({ rotateX: 0, rotateY: 0 });
+      return;
+    }
+    
     const card = e.currentTarget;
     const rect = card.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -141,6 +157,21 @@ export default function MovieCard({ movie, onUpdate, onDelete }: MovieCardProps)
     setIsFlipped(false);
   };
 
+  const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    const target = e.target as HTMLElement;
+    // Não virar se clicou em botão ou elementos dentro de botões
+    if (
+      target.closest('button') || 
+      target.closest('[role="button"]') ||
+      target.closest('footer') ||
+      target.closest('[data-slot="footer"]')
+    ) {
+      return;
+    }
+    setIsFlipped(!isFlipped);
+  };
+
   return (
     <>
       <div 
@@ -157,7 +188,11 @@ export default function MovieCard({ movie, onUpdate, onDelete }: MovieCardProps)
           }}
         >
           {/* Frente do Card */}
-          <div className={styles.flipFront}>
+          <div 
+            className={styles.flipFront}
+            onClick={handleCardClick}
+            style={{ cursor: 'pointer' }}
+          >
             <Card className="w-full h-full flex flex-col">
               <CardHeader className="p-0">
                 <div className="relative w-full h-64 overflow-hidden rounded-t-lg bg-default-100">
@@ -187,9 +222,8 @@ export default function MovieCard({ movie, onUpdate, onDelete }: MovieCardProps)
                 )}
                 {movie.synopsis && (
                   <p 
-                    className="text-sm text-default-600 mb-3 line-clamp-3 cursor-pointer hover:text-gray-400 transition-colors"
-                    onClick={() => setIsFlipped(!isFlipped)}
-                    title="Clique para ver sinopse completa"
+                    className="text-sm text-default-600 mb-3 line-clamp-3"
+                    title="Clique no card para ver sinopse completa"
                   >
                     {movie.synopsis}
                   </p>
@@ -203,24 +237,38 @@ export default function MovieCard({ movie, onUpdate, onDelete }: MovieCardProps)
                   </p>
                 )}
               </CardBody>
-              <CardFooter className="pt-0 px-4 pb-4 gap-2">
-                <Button
-                  size="sm"
-                  variant="flat"
-                  onPress={onOpen}
-                  className="flex-1"
+              <CardFooter 
+                className="pt-0 px-4 pb-4 gap-2"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div 
+                  className="flex gap-2 w-full"
+                  style={{ transform: 'translateZ(100px)', position: 'relative', zIndex: 1000 }}
+                  onMouseMove={(e) => e.stopPropagation()}
+                  onClick={(e) => e.stopPropagation()}
                 >
-                  Ver Detalhes
-                </Button>
-                <Button
-                  size="sm"
-                  color="danger"
-                  variant="light"
-                  onPress={handleDelete}
-                  isLoading={isDeleting}
-                >
-                  Deletar
-                </Button>
+                  <Button
+                    size="sm"
+                    variant="flat"
+                    onPress={onOpen}
+                    className="flex-1"
+                    style={{ position: 'relative', zIndex: 1001 }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    Ver Detalhes
+                  </Button>
+                  <Button
+                    size="sm"
+                    color="danger"
+                    variant="light"
+                    onPress={handleDelete}
+                    isLoading={isDeleting}
+                    style={{ position: 'relative', zIndex: 1001 }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    Deletar
+                  </Button>
+                </div>
               </CardFooter>
             </Card>
           </div>

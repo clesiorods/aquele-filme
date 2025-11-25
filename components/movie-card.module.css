@@ -1,6 +1,7 @@
 .flipContainer {
   perspective: 1000px;
   min-height: 500px;
+  position: relative;
 }
 
 .flipInner {
@@ -25,6 +26,83 @@
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   transform-style: preserve-3d;
+}
+
+/* Apenas a face visível deve ter pointer-events */
+.flipFront {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.flipBack {
+  pointer-events: none;
+}
+
+/* Quando o card está virado, inverter os pointer-events */
+.flipInner.flipped .flipFront {
+  pointer-events: none;
+}
+
+.flipInner.flipped .flipBack {
+  pointer-events: auto;
+}
+
+/* Garantir que elementos interativos na face visível sejam clicáveis */
+.flipFront button,
+.flipFront [role="button"],
+.flipFront a,
+.flipFront [onclick],
+.flipFront .cursor-pointer,
+.flipFront p[onclick],
+.flipFront div[onclick] {
+  pointer-events: auto !important;
+  position: relative !important;
+  z-index: 1000 !important;
+  cursor: pointer !important;
+  will-change: auto !important;
+}
+
+/* Estilo específico para o parágrafo da sinopse */
+.flipFront p.cursor-pointer {
+  pointer-events: auto !important;
+  position: relative !important;
+  z-index: 2000 !important;
+  cursor: pointer !important;
+  will-change: auto !important;
+}
+
+/* Quando virado, apenas os botões da face de trás são clicáveis */
+.flipInner.flipped .flipBack button,
+.flipInner.flipped .flipBack [role="button"],
+.flipInner.flipped .flipBack a,
+.flipInner.flipped .flipBack [onclick],
+.flipInner.flipped .flipBack .cursor-pointer,
+.flipInner.flipped .flipBack p[onclick] {
+  pointer-events: auto !important;
+  position: relative !important;
+  z-index: 1000 !important;
+  cursor: pointer !important;
+  will-change: auto !important;
+}
+
+/* Garantir que o CardFooter na face visível seja clicável */
+.flipFront footer,
+.flipFront [data-slot="footer"],
+.flipFront footer * {
+  pointer-events: auto !important;
+  position: relative !important;
+  z-index: 1000 !important;
+  will-change: auto !important;
+}
+
+/* Quando virado, apenas o footer da face de trás é clicável */
+.flipInner.flipped .flipBack footer,
+.flipInner.flipped .flipBack [data-slot="footer"],
+.flipInner.flipped .flipBack footer * {
+  pointer-events: auto !important;
+  position: relative !important;
+  z-index: 1000 !important;
+  will-change: auto !important;
 }
 
 .flipBack {
