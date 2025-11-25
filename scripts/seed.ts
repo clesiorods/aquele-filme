@@ -15,32 +15,31 @@ async function seed() {
     const dataSource = await getDataSource();
     const userRepository = dataSource.getRepository(User);
 
-    // Verificar se o usuário admin já existe
-    const existingAdmin = await userRepository.findOne({
-      where: { email: "admin@admin.com" },
+    // Verificar se o usuário de demonstração já existe
+    const existingDemo = await userRepository.findOne({
+      where: { email: "demonstracao@demonstracao.com" },
     });
 
-    if (existingAdmin) {
-      console.log("Usuário admin já existe. Pulando criação.");
-      await dataSource.destroy();
-      return;
+    if (!existingDemo) {
+      // Criar usuário de demonstração
+      const hashedDemoPassword = await hashPassword("demonstracao@123");
+      const demoUser = userRepository.create({
+        email: "demonstracao@demonstracao.com",
+        password: hashedDemoPassword,
+        name: "Usuário Demonstração",
+        isAdmin: false,
+      });
+
+      await userRepository.save(demoUser);
+      console.log("✅ Usuário de demonstração criado com sucesso!");
+      console.log("   Email: demonstracao@demonstracao.com");
+      console.log("   Senha: demonstracao@123");
+    } else {
+      console.log("ℹ️  Usuário de demonstração já existe. Pulando criação.");
     }
 
-    // Criar usuário admin
-    const hashedPassword = await hashPassword("admin");
-    const adminUser = userRepository.create({
-      email: "admin@admin.com",
-      password: hashedPassword,
-      name: "Administrador",
-      isAdmin: true,
-    });
-
-    await userRepository.save(adminUser);
-    console.log("Usuário admin criado com sucesso!");
-    console.log("Email: admin@admin.com");
-    console.log("Senha: admin");
-
     await dataSource.destroy();
+    console.log("\n🎉 Seed concluído com sucesso!");
   } catch (error) {
     console.error("Erro ao executar seed:", error);
     process.exit(1);

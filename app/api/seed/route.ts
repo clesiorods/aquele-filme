@@ -16,38 +16,39 @@ export async function POST() {
     const dataSource = await getDataSource();
     const userRepository = dataSource.getRepository(User);
 
-    // Verificar se o usuário admin já existe
-    const existingAdmin = await userRepository.findOne({
-      where: { email: "admin@admin.com" },
+    // Verificar se o usuário de demonstração já existe
+    const existingDemo = await userRepository.findOne({
+      where: { email: "demonstracao@demonstracao.com" },
     });
 
-    if (existingAdmin) {
+    if (existingDemo) {
       return NextResponse.json({
-        message: "Usuário admin já existe",
+        message: "Usuário de demonstração já existe",
         user: {
-          id: existingAdmin.id,
-          email: existingAdmin.email,
-          name: existingAdmin.name,
+          id: existingDemo.id,
+          email: existingDemo.email,
+          name: existingDemo.name,
         },
       });
     }
 
-    // Criar usuário admin
-    const hashedPassword = await hashPassword("admin");
-    const adminUser = userRepository.create({
-      email: "admin@admin.com",
+    // Criar usuário de demonstração
+    const hashedPassword = await hashPassword("demonstracao@123");
+    const demoUser = userRepository.create({
+      email: "demonstracao@demonstracao.com",
       password: hashedPassword,
-      name: "Administrador",
+      name: "Usuário Demonstração",
+      isAdmin: false,
     });
 
-    await userRepository.save(adminUser);
+    await userRepository.save(demoUser);
 
     return NextResponse.json({
-      message: "Usuário admin criado com sucesso!",
+      message: "Usuário de demonstração criado com sucesso!",
       user: {
-        id: adminUser.id,
-        email: adminUser.email,
-        name: adminUser.name,
+        id: demoUser.id,
+        email: demoUser.email,
+        name: demoUser.name,
       },
     });
   } catch (error) {
