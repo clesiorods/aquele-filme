@@ -1,4 +1,9 @@
 import "reflect-metadata";
+import { config } from "dotenv";
+
+// Carregar variáveis de ambiente do arquivo .env
+config();
+
 import { getDataSource } from "@/lib/db";
 import { User } from "@/entities/User";
 import { hashPassword } from "@/lib/auth";
