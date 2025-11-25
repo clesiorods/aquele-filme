@@ -12,22 +12,22 @@ export const siteConfig = {
       label: "Filmes",
       href: "/filmes",
     },
-    {
-      label: "Docs",
-      href: "/docs",
-    },
+    // {
+    //   label: "Docs",
+    //   href: "/docs",
+    // },
     {
       label: "Pricing",
       href: "/pricing",
     },
-    {
-      label: "Blog",
-      href: "/blog",
-    },
-    {
-      label: "About",
-      href: "/about",
-    },
+    // {
+    //   label: "Blog",
+    //   href: "/blog",
+    // },
+    // {
+    //   label: "About",
+    //   href: "/about",
+    // },
   ],
   navMenuItems: [
     {
