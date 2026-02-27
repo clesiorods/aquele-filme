@@ -13,9 +13,9 @@ export default function LoginPage() {
   const router = useRouter();
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    name: "",
+    email: "demonstracao@demonstracao.com",
+    password: "demonstracao@123",
+    name: "Usuário Demonstração",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
