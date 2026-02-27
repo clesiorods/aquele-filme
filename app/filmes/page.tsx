@@ -19,6 +19,7 @@ interface Movie {
   coverImage: string | null;
   comments: string | null;
   rating: number;
+  duration: number | null;
   watched: boolean;
   createdAt: string;
   updatedAt: string;
@@ -45,7 +46,7 @@ export default function FilmesPage() {
       setLoading(true);
       const watchedParam = filter === "watched" ? "true" : filter === "want" ? "false" : null;
       const url = watchedParam ? `/api/movies?watched=${watchedParam}` : "/api/movies";
-      
+
       const response = await fetch(url);
       if (response.status === 401) {
         router.push("/login");

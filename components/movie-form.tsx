@@ -121,9 +121,9 @@ export default function MovieForm({ movie, onSuccess }: MovieFormProps) {
                 placeholder="Ex: 120"
                 value={formData.duration?.toString() || ""}
                 onChange={(e) =>
-                  setFormData({ 
-                    ...formData, 
-                    duration: e.target.value ? parseInt(e.target.value) : null 
+                  setFormData({
+                    ...formData,
+                    duration: e.target.value ? parseInt(e.target.value) : null
                   })
                 }
                 isDisabled={loading}
@@ -142,9 +142,9 @@ export default function MovieForm({ movie, onSuccess }: MovieFormProps) {
               />
 
               <div>
-                <label className="text-sm font-medium mb-2 block">
+                <p className="text-sm font-medium mb-2 block" id="add-rating-label">
                   Avaliação
-                </label>
+                </p>
                 <StarRating
                   rating={formData.rating}
                   onRatingChange={(rating) =>

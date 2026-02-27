@@ -6,9 +6,10 @@ import { getCurrentUser } from "@/lib/auth";
 // GET - Buscar filme específico
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const { id } = await params;
     const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json(
@@ -21,7 +22,7 @@ export async function GET(
     const movieRepository = dataSource.getRepository(Movie);
 
     const movie = await movieRepository.findOne({
-      where: { id: parseInt(params.id), userId: user.id },
+      where: { id: parseInt(id), userId: user.id },
     });
 
     if (!movie) {
@@ -44,9 +45,10 @@ export async function GET(
 // PUT - Atualizar filme
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const { id } = await params;
     const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json(
@@ -62,7 +64,7 @@ export async function PUT(
     const movieRepository = dataSource.getRepository(Movie);
 
     const movie = await movieRepository.findOne({
-      where: { id: parseInt(params.id), userId: user.id },
+      where: { id: parseInt(id), userId: user.id },
     });
 
     if (!movie) {
@@ -98,9 +100,10 @@ export async function PUT(
 // DELETE - Deletar filme
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const { id } = await params;
     const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json(
@@ -113,7 +116,7 @@ export async function DELETE(
     const movieRepository = dataSource.getRepository(Movie);
 
     const movie = await movieRepository.findOne({
-      where: { id: parseInt(params.id), userId: user.id },
+      where: { id: parseInt(id), userId: user.id },
     });
 
     if (!movie) {

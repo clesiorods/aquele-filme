@@ -124,31 +124,31 @@ export default function MovieCard({ movie, onUpdate, onDelete }: MovieCardProps)
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     // Não aplicar efeito 3D se o mouse estiver sobre elementos interativos
     const target = e.target as HTMLElement;
-    const isInteractive = 
-      target.closest('button') || 
-      target.closest('[role="button"]') || 
+    const isInteractive =
+      target.closest('button') ||
+      target.closest('[role="button"]') ||
       target.closest('a') ||
       target.closest('footer') ||
       target.closest('[data-slot="footer"]') ||
       target.tagName === 'BUTTON' ||
       target.tagName === 'A';
-    
+
     if (isInteractive) {
       setTiltStyle({ rotateX: 0, rotateY: 0 });
       return;
     }
-    
+
     const card = e.currentTarget;
     const rect = card.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    
+
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
-    
+
     const rotateX = ((y - centerY) / centerY) * 7; // Parte onde o mouse passa fica mais alta
     const rotateY = ((x - centerX) / centerX) * -7;
-    
+
     setTiltStyle({ rotateX, rotateY });
   };
 
@@ -162,7 +162,7 @@ export default function MovieCard({ movie, onUpdate, onDelete }: MovieCardProps)
     const target = e.target as HTMLElement;
     // Não virar se clicou em botão ou elementos dentro de botões
     if (
-      target.closest('button') || 
+      target.closest('button') ||
       target.closest('[role="button"]') ||
       target.closest('footer') ||
       target.closest('[data-slot="footer"]')
@@ -174,24 +174,31 @@ export default function MovieCard({ movie, onUpdate, onDelete }: MovieCardProps)
 
   return (
     <>
-      <div 
+      <div
         className={`w-full h-full ${styles.flipContainer}`}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
       >
-        <div 
+        <div
           className={`${styles.flipInner} ${isFlipped ? styles.flipped : ""}`}
           style={{
-            transform: isFlipped 
+            transform: isFlipped
               ? `rotateY(180deg) rotateX(${tiltStyle.rotateX}deg) rotateY(${tiltStyle.rotateY}deg)`
               : `rotateX(${tiltStyle.rotateX}deg) rotateY(${tiltStyle.rotateY}deg)`,
           }}
         >
           {/* Frente do Card */}
-          <div 
+          <div
             className={styles.flipFront}
             onClick={handleCardClick}
             style={{ cursor: 'pointer' }}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                handleCardClick(e as any);
+              }
+            }}
           >
             <Card className="w-full h-full flex flex-col">
               <CardHeader className="p-0">
@@ -221,7 +228,7 @@ export default function MovieCard({ movie, onUpdate, onDelete }: MovieCardProps)
                   </p>
                 )}
                 {movie.synopsis && (
-                  <p 
+                  <p
                     className="text-sm text-default-600 mb-3 line-clamp-3"
                     title="Clique no card para ver sinopse completa"
                   >
@@ -233,19 +240,21 @@ export default function MovieCard({ movie, onUpdate, onDelete }: MovieCardProps)
                 </div>
                 {movie.comments && (
                   <p className="text-xs text-default-500 line-clamp-2 italic">
-                    "{movie.comments}"
+                    &quot;{movie.comments}&quot;
                   </p>
                 )}
               </CardBody>
-              <CardFooter 
+              <CardFooter
                 className="pt-0 px-4 pb-4 gap-2"
                 onClick={(e) => e.stopPropagation()}
               >
-                <div 
+                <div
                   className="flex gap-2 w-full"
                   style={{ transform: 'translateZ(100px)', position: 'relative', zIndex: 1000 }}
                   onMouseMove={(e) => e.stopPropagation()}
                   onClick={(e) => e.stopPropagation()}
+                  onKeyDown={(e) => e.stopPropagation()}
+                  role="presentation"
                 >
                   <Button
                     size="sm"
@@ -319,7 +328,7 @@ export default function MovieCard({ movie, onUpdate, onDelete }: MovieCardProps)
                       <div className="flex-1 ml-4 pl-4 border-l border-default-200">
                         <p className="text-xs text-default-500 mb-1">Comentário</p>
                         <p className="text-sm text-default-600 italic line-clamp-2">
-                          "{movie.comments}"
+                          &quot;{movie.comments}&quot;
                         </p>
                       </div>
                     )}
@@ -329,7 +338,7 @@ export default function MovieCard({ movie, onUpdate, onDelete }: MovieCardProps)
             </Card>
           </div>
         </div>
-      </div>
+      </div >
 
       <Modal isOpen={isOpen} onClose={onClose} size="2xl" scrollBehavior="inside">
         <ModalContent>
@@ -375,9 +384,9 @@ export default function MovieCard({ movie, onUpdate, onDelete }: MovieCardProps)
                       placeholder="Ex: 120"
                       value={formData.duration?.toString() || ""}
                       onChange={(e) =>
-                        setFormData({ 
-                          ...formData, 
-                          duration: e.target.value ? parseInt(e.target.value) : null 
+                        setFormData({
+                          ...formData,
+                          duration: e.target.value ? parseInt(e.target.value) : null
                         })
                       }
                       isDisabled={loading}
@@ -415,9 +424,9 @@ export default function MovieCard({ movie, onUpdate, onDelete }: MovieCardProps)
                       minRows={3}
                     />
                     <div>
-                      <label className="text-sm font-medium mb-2 block">
+                      <p className="text-sm font-medium mb-2 block" id="rating-label">
                         Avaliação
-                      </label>
+                      </p>
                       <StarRating
                         rating={formData.rating}
                         onRatingChange={(rating) =>
